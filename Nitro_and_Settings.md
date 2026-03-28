@@ -5,9 +5,9 @@ This is the last setup, so all other have already been done in order to get Nitr
 ## Nitro Client Setup
 
 ```shell
-git clone https://github.com/billsonnn/nitro-react.git /source/nitro
-cd /source/nitro
-git checkout dev
+cd /var/www
+git clone https://github.com/duckietm/Nitro-V3.git
+cd /var/www/Nitro-V3
 ```
 go to : [Config settings](https://git.krews.org/duckietm/ubuntu-tutorial/-/tree/main/Config)
 Download the : ui-config.json and renderer-config.json files and save them local on your PC  
@@ -15,100 +15,50 @@ Now edit both files and replace : ###YOUR DOMAIN### with your domain name or IP,
 - https if you are using the SSL solution described in Cloudflare_SSL setup or have an CDN / Webserver solution that supports SSL  
 - in renderer-config.json use WSS when using Cloudflare or an Valid SSL on the Emulator  
 
-Once done editing the files copy them to :/source/nitro/public useing WISCP or any other SSH file transfer tool
-```shell
-cd /source/nitro
-npm i yarn -g
-```
-```shell
-yarn install
-```
+Once done editing the files copy them to :/var/www/Nitro-V3/public useing WISCP or any other SSH file transfer tool, before you continue please read the install instructions from NitroV3 as you need to link the renderer
 
 ```vi
-vi /source/nitro/public/index.html
+vi /var/www/Nitro-V3/public/index.html
 ```
-You need to make the index.html look like
+You need to make sure the index.html has the base set, do not change any other settings as that will break the compiling of the client
 ```text
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-  <title>#Your Hotelname#</title>
-  <meta charset="utf-8" />
   <base href="/client/">
-  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-  <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png">
-  <link rel="manifest" crossorigin="use-credentials" href="site.webmanifest">
-  <link rel="mask-icon" href="%PUBLIC_URL%/safari-pinned-tab.svg" color="#000000">
-  <meta name="apple-mobile-web-app-title" content="#Your Hotelname#">
-  <meta name="application-name" content="#Your Hotelname#">
-  <meta name="msapplication-TileColor" content="#000000">
-  <meta name="theme-color" content="#000000" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root" class="w-100 h-100"></div>
-    <script>
-      const NitroConfig = {
-        "config.urls": [ 'renderer-config.json?v=1', 'ui-config.json?v=1' ],
-        "sso.ticket": (new URLSearchParams(window.location.search).get('sso') || null),
-        "forward.type": (new URLSearchParams(window.location.search).get('room') ? 2 : -1),
-        "forward.id": (new URLSearchParams(window.location.search).get('room') || 0),
-        "friend.id": (new URLSearchParams(window.location.search).get('friend') || 0),
-      };
-    </script>
-  </body>
-</html>
 ````
-
+Now start compiling Nitro
 ```shell
-yarn build:prod
-```
-```shell
-cd /source/nitro/build
-mkdir /var/www/Client
-cp -r * /var/www//Client
-vi /var/www/atomcms/.env
-```
-in the editor edit the : ```NITRO_CLIENT_PATH``` to look like:
-```ini
-NITRO_CLIENT_PATH=/client
+yarn build
 ```
 
 ```shell
-mkdir /var/www/Gamedata/effect
-mkdir /var/www/Gamedata/clothes
-mkdir /var/www/Gamedata/furniture
-mkdir /var/www/Gamedata/pets
-mkdir /var/www/Gamedata/icons
-mkdir /var/www/Gamedata/sounds
-mkdir /var/www/Gamedata/c_images/
-mkdir /var/www/Gamedata/c_images/catalogue
+mkdir /var/www/gamedata/effect
+mkdir /var/www/gamedata/clothes
+mkdir /var/www/gamedata/furniture
+mkdir /var/www/gamedata/pets
+mkdir /var/www/gamedata/icons
+mkdir /var/www/gamedata/sounds
+mkdir /var/www/gamedata/c_images/
+mkdir /var/www/gamedata/c_images/catalogue
 ```
 
 If you got the [The All 1 one Nitro Converter](https://git.krews.org/duckietm/converter)
 You can copy over the following:
-- C:\tools\Convert\assets\bundled\effect --> /var/www/Gamedata/effect
-- C:\tools\Convert\assets\bundled\figure --> /var/www/Gamedata/clothes
-- C:\tools\Convert\assets\bundled\furniture --> /var/www/Gamedata/furniture
-- C:\tools\Convert\assets\bundled\pets --> /var/www/Gamedata/pets
-- C:\tools\Convert\assets\bundled\Furni_Icons  --> /var/www/Gamedata/icons
-- C:\tools\DownloadHabbo\mp3  --> /var/www/Gamedata/sounds
+- C:\tools\Convert\assets\bundled\effect --> /var/www/gamedata/effect
+- C:\tools\Convert\assets\bundled\figure --> /var/www/gamedata/clothes
+- C:\tools\Convert\assets\bundled\furniture --> /var/www/gamedata/furniture
+- C:\tools\Convert\assets\bundled\pets --> /var/www/gamedata/pets
+- C:\tools\Convert\assets\bundled\Furni_Icons  --> /var/www/gamedata/icons
+- C:\tools\DownloadHabbo\mp3  --> /var/www/gamedata/sounds
 - C:\tools\DownloadHabbo\badges  --> /var/www/Gamedata/c_images/album1584
 - [Default asstes] Add-ons/default_gamedata.zip --> /var/www/retrohotel/Gamedata/
 
 # Setup the websocket
 
 ## How do I configure the plugin?
-Startup the plugin so it generates the required entries under your `emulator_settings` table. The following fields will be generated:
-- `websockets.whitelist` - a comma-delimited list containing all permitted Origin headers. You should write the domain name of your hotel here, since the Websocket connection will be initiated there. Wildcards are also supported, so you can whitelist all subdomains by adding for example: `*.example.com`, or even whitelist all origins by adding `*` (not recommended)
-- `ws.nitro.host` - host ip, should leave it as 0.0.0.0
-- `ws.nitro.port` - host port, can be any port but if you want to proxy wss traffic with Cloudflare read the following section
-- `ws.nitro.ip.header` - header that will be used for obtaining the user's real ip address if server is behind a proxy. Will most likely be needed to be set to `X-Forwarded-For` or `CF-Connecting-IP` if behind Cloudflare.
+in the emulator directory there is the file config.ini here you need to cofigure the websocket settins
+- `ws.enabled` - true, this will enable or disable the websocket
+- `ws.host` - host ip, should leave it as 0.0.0.0
+- `ws.port` - host port, can be any port but if you want to proxy wss traffic with Cloudflare read the following section
+- `ws.ip.header` - header that will be used for obtaining the user's real ip address if server is behind a proxy. Will most likely be needed to be set to `X-Forwarded-For` or `CF-Connecting-IP` if behind Cloudflare.
 
 ## How do I connect to my emulator using Secure Websockets (wss)? ##
 You have several options to add WSS support to your websocket server. 
@@ -142,7 +92,6 @@ Make sure your private key is in PKCS#8 format. You can convert it to PKCS8 form
 openssl pkcs8 -topk8 -nocrypt -in yourkey.pem -out yournewkey.pem
 ```
 
-
 **I am getting disconnected from the client with no error logs**
 
 Make sure your sso ticket is valid and that you didn't do an IP ban before configuring the `ws.nitro.ip.header` if you're behind a proxy.
@@ -161,13 +110,12 @@ location / {
 Paste:
 ```
         location /client {
-        limit_conn addr 10;
-        alias /var/www/atomcms/Client;
+        alias /var/www/Nitro-V3/dist;
         autoindex off;
         }
 
         location /gamedata {
-        alias /var/www/atomcms/Gamedata;
+        alias /var/www/gamedata;
         access_log off;
         autoindex off;
         }
